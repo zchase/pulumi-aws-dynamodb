@@ -6,30 +6,40 @@ import * as utilities from "./utilities";
 
 // Export members:
 export * from "./provider";
-export * from "./staticPage";
+export * from "./table";
+
+// Export enums:
+export * from "./types/enums";
+
+// Export sub-modules:
+import * as types from "./types";
+
+export {
+    types,
+};
 
 // Import resources to register:
-import { StaticPage } from "./staticPage";
+import { Table } from "./table";
 
 const _module = {
     version: utilities.getVersion(),
     construct: (name: string, type: string, urn: string): pulumi.Resource => {
         switch (type) {
-            case "xyz:index:StaticPage":
-                return new StaticPage(name, <any>undefined, { urn })
+            case "aws-dynamodb:index:Table":
+                return new Table(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`);
         }
     },
 };
-pulumi.runtime.registerResourceModule("xyz", "index", _module)
+pulumi.runtime.registerResourceModule("aws-dynamodb", "index", _module)
 
 import { Provider } from "./provider";
 
-pulumi.runtime.registerResourcePackage("xyz", {
+pulumi.runtime.registerResourcePackage("aws-dynamodb", {
     version: utilities.getVersion(),
     constructProvider: (name: string, type: string, urn: string): pulumi.ProviderResource => {
-        if (type !== "pulumi:providers:xyz") {
+        if (type !== "pulumi:providers:aws-dynamodb") {
             throw new Error(`unknown provider type ${type}`);
         }
         return new Provider(name, <any>undefined, { urn });

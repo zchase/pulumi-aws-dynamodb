@@ -1,39 +1,269 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/pulumi/pulumi/master/pkg/codegen/schema/pulumi.json
 ---
-name: xyz
+name: aws-dynamodb
+types:
+  aws-dynamodb:index:TableType:
+    type: string
+    description: The type of DynamoDB Table.
+    enum:
+      - value: default
+      - value: basic
+      - value: advanced
+      - value: expert
+  aws-dynamodb:index:TableKeyType:
+    type: string
+    description: The type of key for your DynamoDB Table.
+    enum:
+      - value: string
+      - value: number
+  aws-dynamodb:index:ProvisionedTableArgs:
+    type: object
+    description: |
+      The arguments needed for a Provisioned AWS DynamoDB Table. If not provided, then the Table
+      will be provisioned in OnDemand mode.
+    properties:
+      readCapacity:
+        type: integer
+        description: The number of read units for this index. Must be set if billing_mode is set to PROVISIONED.
+      writeCapacity:
+        type: integer
+        description: The number of write units for this index. Must be set if billing_mode is set to PROVISIONED.
+    required:
+      - readCapacity
+      - writeCapacity
+  aws-dynamodb:index:BasicTableArgs:
+    description: Arguments for a basic AWS DynamoDB Table.
+    type: object
+    properties:
+      name:
+        type: string
+      hashKey:
+        willReplaceOnChanges: true
+        type: object
+        properties:
+          name:
+            type: string
+          type:
+            $ref: "#/types/aws-dynamodb:index:TableKeyType"
+      rangeKey:
+        type: object
+        properties:
+          name:
+            type: string
+          type:
+            $ref: "#/types/aws-dynamodb:index:TableKeyType"
+      provisioned:
+        $ref: "#/types/aws-dynamodb:index:ProvisionedTableArgs"
+      tags:
+        description: A map of tags assigned to the resource, including those inherited from the provider .
+        type: object
+        additionalProperties:
+          type: string
+
+  aws-dynamodb:index:IntermediateTableArgs:
+    description: Arguments for a basic AWS DynamoDB Table.
+    type: object
+    properties:
+      name:
+        type: string
+      attributes:
+        type: array
+        items:
+          $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableAttribute:TableAttribute"
+        description: >
+          List of nested attribute definitions. Only required for `hash_key` and
+          `range_key` attributes.
+      rangeKey:
+        description: The name of the range key; must be defined.
+        type: string
+      hashKey:
+        type: string
+        description: |
+          The name of the hash key in the index; must be
+          defined as an attribute in the resource.
+        willReplaceOnChanges: true
+      globalSecondaryIndexes:
+        type: array
+        items:
+          $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableGlobalSecondaryIndex:TableGlobalSecondaryIndex"
+        description: |
+          Describe a GSI for the table;
+          subject to the normal limits on the number of GSIs, projected
+          attributes, etc.
+      localSecondaryIndexes:
+        type: array
+        items:
+          $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableLocalSecondaryIndex:TableLocalSecondaryIndex"
+        description: |
+          Describe an LSI on the table;
+          these can only be allocated *at creation* so you cannot change this
+          definition after you have created the resource.
+        willReplaceOnChanges: true
+      provisioned:
+        $ref: "#/types/aws-dynamodb:index:ProvisionedTableArgs"
+      tags:
+        description: A map of tags assigned to the resource, including those inherited from the provider .
+        type: object
+        additionalProperties:
+          type: string
+  aws-dynamodb:index:ExpertTableArgs:
+    description: Arguments for a basic AWS DynamoDB Table.
+    type: object
+    properties:
+      attributes:
+        type: array
+        items:
+          $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableAttribute:TableAttribute"
+        description: >
+          List of nested attribute definitions. Only required for `hash_key` and
+          `range_key` attributes.
+      billingMode:
+        type: string
+        description: >
+          Controls how you are charged for read and write throughput and how you
+          manage capacity. The valid values are `PROVISIONED` and `PAY_PER_REQUEST`.
+          Defaults to `PROVISIONED`.
+      globalSecondaryIndexes:
+        type: array
+        items:
+          $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableGlobalSecondaryIndex:TableGlobalSecondaryIndex"
+        description: |
+          Describe a GSI for the table;
+          subject to the normal limits on the number of GSIs, projected
+          attributes, etc.
+      hashKey:
+        type: string
+        description: |
+          The name of the hash key in the index; must be
+          defined as an attribute in the resource.
+        willReplaceOnChanges: true
+      localSecondaryIndexes:
+        type: array
+        items:
+          $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableLocalSecondaryIndex:TableLocalSecondaryIndex"
+        description: |
+          Describe an LSI on the table;
+          these can only be allocated *at creation* so you cannot change this
+          definition after you have created the resource.
+        willReplaceOnChanges: true
+      name:
+        type: string
+        description: |
+          The name of the index
+        willReplaceOnChanges: true
+      pointInTimeRecovery:
+        $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TablePointInTimeRecovery:TablePointInTimeRecovery"
+        description: |
+          Enable point-in-time recovery options.
+      rangeKey:
+        type: string
+        description: |
+          The name of the range key; must be defined
+        willReplaceOnChanges: true
+      readCapacity:
+        type: integer
+        description: >
+          The number of read units for this index. Must be set if billing_mode is
+          set to PROVISIONED.
+      replicas:
+        type: array
+        items:
+          $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableReplica:TableReplica"
+        description: >
+          Configuration block(s) with [DynamoDB Global Tables V2 (version
+          2019.11.21)](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables.V2.html)
+          replication configurations. Detailed below.
+      restoreDateTime:
+        type: string
+        description: |
+          The time of the point-in-time recovery point to restore.
+        willReplaceOnChanges: true
+      restoreSourceName:
+        type: string
+        description: >
+          The name of the table to restore. Must match the name of an existing
+          table.
+        willReplaceOnChanges: true
+      restoreToLatestTime:
+        type: boolean
+        description: |
+          If set, restores table to the most recent point-in-time recovery point.
+        willReplaceOnChanges: true
+      serverSideEncryption:
+        $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableServerSideEncryption:TableServerSideEncryption"
+        description: >
+          Encryption at rest options. AWS DynamoDB tables are automatically
+          encrypted at rest with an AWS owned Customer Master Key if this argument
+          isn't specified.
+      streamEnabled:
+        type: boolean
+        description: |
+          Indicates whether Streams are to be enabled (true) or disabled (false).
+      streamViewType:
+        type: string
+        description: >
+          When an item in the table is modified, StreamViewType determines what
+          information is written to the table's stream. Valid values are
+          `KEYS_ONLY`, `NEW_IMAGE`, `OLD_IMAGE`, `NEW_AND_OLD_IMAGES`.
+      tableClass:
+        type: string
+        description: >
+          The storage class of the table. Valid values are `STANDARD` and
+          `STANDARD_INFREQUENT_ACCESS`.
+      tags:
+        type: object
+        additionalProperties:
+          type: string
+        description: >
+          A map of tags to populate on the created table. If configured with a
+          provider `default_tags` configuration block present, tags with matching
+          keys will overwrite those defined at the provider-level.
+      ttl:
+        $ref: "/aws/v5.4.0/schema.json#/types/aws:dynamodb/TableTtl:TableTtl"
+        description: |
+          Defines ttl, has two properties, and can only be specified once:
+      writeCapacity:
+        type: integer
+        description: >
+          The number of write units for this index. Must be set if billing_mode is
+          set to PROVISIONED.
+
 resources:
-  xyz:index:StaticPage:
+  aws-dynamodb:index:Table:
     isComponent: true
     inputProperties:
-      indexContent:
-        type: string
-        description: The HTML content for index.html.
+      type:
+        $ref: "#/types/aws-dynamodb:index:TableType"
+      basic:
+        $ref: "#/types/aws-dynamodb:index:BasicTableArgs"
+      advanced:
+        $ref: "#/types/aws-dynamodb:index:IntermediateTableArgs"
+      expert:
+        $ref: "#/types/aws-dynamodb:index:ExpertTableArgs"
     requiredInputs:
-      - indexContent
+      - type
     properties:
-      bucket:
-        "$ref": "/aws/v4.0.0/schema.json#/resources/aws:s3%2Fbucket:Bucket"
-        description: The bucket resource.
-      websiteUrl:
-        type: string
-        description: The website URL.
+      outputs:
+        $ref: "/aws/v5.4.0/schema.json#/resources/aws:dynamodb%2Ftable:Table"
     required:
-      - bucket
-      - websiteUrl
+      - outputs
+
 language:
   csharp:
+    namespaces:
+      "aws-dynamodb": "AwsDynamoDB"
     packageReferences:
       Pulumi: 3.*
-      Pulumi.Aws: 4.*
+      Pulumi.Aws: 5.*
   go:
     generateResourceContainerTypes: true
-    importBasePath: github.com/pulumi/pulumi-xyz/sdk/go/xyz
+    importBasePath: github.com/pulumi/pulumi-aws-dynamodb/sdk/go/aws-dynamodb
   nodejs:
     dependencies:
-      "@pulumi/aws": "^4.0.0"
+      "@pulumi/aws": "^5.0.0"
     devDependencies:
       typescript: "^3.7.0"
   python:
     requires:
       pulumi: ">=3.0.0,<4.0.0"
-      pulumi-aws: ">=4.0.0,<5.0.0"
+      pulumi-aws: ">=5.0.0,<6.0.0"

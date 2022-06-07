@@ -7,33 +7,24 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
 
-namespace Pulumi.Xyz
+namespace Pulumi.AwsDynamoDB
 {
-    [XyzResourceType("xyz:index:StaticPage")]
-    public partial class StaticPage : Pulumi.ComponentResource
+    [AwsDynamoDBResourceType("aws-dynamodb:index:Table")]
+    public partial class Table : Pulumi.ComponentResource
     {
-        /// <summary>
-        /// The bucket resource.
-        /// </summary>
-        [Output("bucket")]
-        public Output<Pulumi.Aws.S3.Bucket> Bucket { get; private set; } = null!;
-
-        /// <summary>
-        /// The website URL.
-        /// </summary>
-        [Output("websiteUrl")]
-        public Output<string> WebsiteUrl { get; private set; } = null!;
+        [Output("outputs")]
+        public Output<Pulumi.Aws.DynamoDB.Table> Outputs { get; private set; } = null!;
 
 
         /// <summary>
-        /// Create a StaticPage resource with the given unique name, arguments, and options.
+        /// Create a Table resource with the given unique name, arguments, and options.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public StaticPage(string name, StaticPageArgs args, ComponentResourceOptions? options = null)
-            : base("xyz:index:StaticPage", name, args ?? new StaticPageArgs(), MakeResourceOptions(options, ""), remote: true)
+        public Table(string name, TableArgs args, ComponentResourceOptions? options = null)
+            : base("aws-dynamodb:index:Table", name, args ?? new TableArgs(), MakeResourceOptions(options, ""), remote: true)
         {
         }
 
@@ -50,15 +41,21 @@ namespace Pulumi.Xyz
         }
     }
 
-    public sealed class StaticPageArgs : Pulumi.ResourceArgs
+    public sealed class TableArgs : Pulumi.ResourceArgs
     {
-        /// <summary>
-        /// The HTML content for index.html.
-        /// </summary>
-        [Input("indexContent", required: true)]
-        public Input<string> IndexContent { get; set; } = null!;
+        [Input("advanced")]
+        public Input<Inputs.IntermediateTableArgsArgs>? Advanced { get; set; }
 
-        public StaticPageArgs()
+        [Input("basic")]
+        public Input<Inputs.BasicTableArgsArgs>? Basic { get; set; }
+
+        [Input("expert")]
+        public Input<Inputs.ExpertTableArgsArgs>? Expert { get; set; }
+
+        [Input("type", required: true)]
+        public Input<Pulumi.AwsDynamoDB.TableType> Type { get; set; } = null!;
+
+        public TableArgs()
         {
         }
     }
